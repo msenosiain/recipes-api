@@ -2,7 +2,6 @@ const express = require('express');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 
-const indexRouter = require('./routes/index');
 const apiRouter = require('./routes/api');
 
 const app = express();
@@ -19,7 +18,6 @@ var db = mongoose.connection;
 if (!db) console.log('Error connecting db');
 else console.log('Db connected successfully');
 
-app.use('/', indexRouter);
 app.use('/api', apiRouter);
 
 module.exports = app;
