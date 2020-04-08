@@ -3,14 +3,29 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "mongoosastic": "^4.6.0",
     "mongoose": "^5.9.7",
     "morgan": "~1.9.1"
+  },
+  "devDependencies": {
+    "husky": "^4.2.3",
+    "lint-staged": "^10.1.2",
+    "prettier": "2.0.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
   }
 }
