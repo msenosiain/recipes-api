@@ -1,27 +1,24 @@
 const mongoose = require('mongoose');
 const mongoosastic = require('mongoosastic');
 
-const recipeSchema = mongoose.Schema({
-  title: {
-    type: String,
-    required: true
+const ingredientSchema = mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    quantity: Number,
+    unit: String
   },
-  ingredients: [
-    {
-      name: String,
-      quantity: Number,
-      unit: { type: String, enum: ['g', 'kg', 'l', 'ml'] }
-    }
-  ],
-  procedure: {
-    type: String,
-    required: true
+  { _id: false }
+);
+
+const recipeSchema = mongoose.Schema(
+  {
+    categories: { type: [String], required: true },
+    title: { type: String, required: true },
+    ingredients: { type: [ingredientSchema], required: true },
+    procedure: { type: String, required: true }
   },
-  create_date: {
-    type: Date,
-    default: Date.now
-  }
-});
+  { timestamps: true }
+);
 
 recipeSchema.plugin(mongoosastic, {
   host: 'niles',
@@ -35,6 +32,3 @@ Recipe.createMapping((err, mapping) => {
 });
 
 module.exports = Recipe;
-module.exports.get = function (callback, limit) {
-  Recipe.find(callback).limit(limit);
-};
