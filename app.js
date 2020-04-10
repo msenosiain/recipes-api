@@ -11,12 +11,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Connect to Mongoose and set connection variable
-mongoose.connect('mongodb://niles/recipes', { useNewUrlParser: true });
-var db = mongoose.connection;
-
-// Added check for DB connection
-if (!db) console.log('Error connecting db');
-else console.log('Db connected successfully');
+mongoose
+  .connect('mongodb://niles/recipes', {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+  })
+  .then(() => console.log('Db connected successfully'))
+  .catch(err => {
+    console.error('Error connecting db', err.message);
+  });
 
 app.use('/api', apiRouter);
 
