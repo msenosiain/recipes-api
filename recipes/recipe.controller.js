@@ -1,27 +1,55 @@
+resHelper = require('../helpers/response.helper');
 Recipe = require('./recipe.model');
+
+const NOT_FOUND_ONE = 'Recipe not found';
+const NOT_FOUND_MANY = 'No recipes found';
+
 // Handle index actions
-exports.index = function (req, res, next) {
+exports.index = (req, res) => {
   Recipe.find({}, function (err, recipes) {
-    handleNotFound(recipes, res, next);
-    handleError(err, res);
+    if (!recipes || !recipes.length) {
+      resHelper.handleNotFound(NOT_FOUND_MANY, res);
+    }
+    if (err) {
+      resHelper.handleError(err, res);
+    }
     if (recipes.length) {
-      res.json({
+      return res.json({
         message: 'Recipes retrieved successfully',
         data: recipes
       });
     }
   });
 };
+exports.reindex = (req, res) => {
+  const stream = Recipe.synchronize();
+  let count = 0;
+
+  stream.on('data', function (err, doc) {
+    count++;
+  });
+  stream.on('close', function () {
+    console.log('indexed ' + count + ' documents!');
+    res.status(200).end();
+  });
+  stream.on('error', function (err) {
+    console.log(err);
+  });
+};
 // Handle create recipe actions
-exports.new = function (req, res) {
+exports.new = (req, res) => {
   var recipe = new Recipe();
   saveRecipe(recipe, req, res);
 };
 // Handle view contact info
 exports.view = function (req, res) {
   Recipe.findById(req.params.id, function (err, recipe) {
-    handleNotFound(recipe, res);
-    handleError(err, res);
+    if (!recipe) {
+      resHelper.handleNotFound(NOT_FOUND_ONE, res);
+    }
+    if (err) {
+      resHelper.handleError(err, res);
+    }
     if (recipe) {
       res.json({
         message: 'Recipe details',
@@ -33,8 +61,12 @@ exports.view = function (req, res) {
 // Handle update contact info
 exports.update = function (req, res) {
   Recipe.findById(req.params.id, function (err, recipe) {
-    handleNotFound(recipe, res);
-    handleError(err, res);
+    if (!recipe) {
+      resHelper.handleNotFound(NOT_FOUND_ONE, res);
+    }
+    if (err) {
+      resHelper.handleError(err, res);
+    }
     if (recipe) {
       saveRecipe(recipe, req, res);
     }
@@ -57,44 +89,21 @@ exports.delete = function (req, res) {
 };
 
 function saveRecipe(recipe, req, res) {
-  const { categories, title, ingredients, procedure } = req.body;
+  const { categories, title, ingredients, procedure, image } = req.body;
   recipe.categories = categories;
   recipe.title = title;
   recipe.ingredients = ingredients;
   recipe.procedure = procedure;
+  recipe.image = image;
 
   recipe.save(err => {
-    handleError(err);
-    let message = recipe._v ? 'Recipe updated!' : 'New recipe created!';
+    if (err) {
+      resHelper.handleError(err, res);
+    }
+    let message = recipe.__v ? 'Recipe updated!' : 'New recipe created!';
     res.json({
       message,
       data: recipe
     });
   });
-}
-
-function handleNotFound(item, res, next) {
-  if (!item || !item.length) {
-    res.status(404).json({
-      status: 'error',
-      message: 'Recipe not found'
-    });
-  }
-}
-
-function handleError(err, res) {
-  if (err) {
-    switch (err.name) {
-      case 'ValidationError':
-        res.status(400);
-        break;
-      default:
-        res.status(500);
-        break;
-    }
-    res.json({
-      error: err.message,
-      response: err
-    });
-  }
 }
