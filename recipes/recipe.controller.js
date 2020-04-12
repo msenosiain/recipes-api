@@ -6,7 +6,7 @@ const NOT_FOUND_MANY = 'No recipes found';
 
 // Handle index actions
 exports.index = (req, res) => {
-  Recipe.find({}, function (err, recipes) {
+  Recipe.find({}, (err, recipes) => {
     if (!recipes || !recipes.length) {
       resHelper.handleNotFound(NOT_FOUND_MANY, res);
     }
@@ -25,14 +25,14 @@ exports.reindex = (req, res) => {
   const stream = Recipe.synchronize();
   let count = 0;
 
-  stream.on('data', function (err, doc) {
+  stream.on('data', (err, doc) => {
     count++;
   });
-  stream.on('close', function () {
+  stream.on('close', () => {
     console.log('indexed ' + count + ' documents!');
     res.status(200).end();
   });
-  stream.on('error', function (err) {
+  stream.on('error', err => {
     console.log(err);
   });
 };
@@ -42,8 +42,8 @@ exports.new = (req, res) => {
   saveRecipe(recipe, req, res);
 };
 // Handle view contact info
-exports.view = function (req, res) {
-  Recipe.findById(req.params.id, function (err, recipe) {
+exports.view = (req, res) => {
+  Recipe.findById(req.params.id, (err, recipe) => {
     if (!recipe) {
       resHelper.handleNotFound(NOT_FOUND_ONE, res);
     }
@@ -59,8 +59,8 @@ exports.view = function (req, res) {
   });
 };
 // Handle update contact info
-exports.update = function (req, res) {
-  Recipe.findById(req.params.id, function (err, recipe) {
+exports.update = (req, res) => {
+  Recipe.findById(req.params.id, (err, recipe) => {
     if (!recipe) {
       resHelper.handleNotFound(NOT_FOUND_ONE, res);
     }
@@ -73,12 +73,12 @@ exports.update = function (req, res) {
   });
 };
 // Handle delete contact
-exports.delete = function (req, res) {
+exports.delete = (req, res) => {
   Recipe.remove(
     {
       _id: req.params.id
     },
-    function (err, recipe) {
+    (err, recipe) => {
       if (err) res.send(err);
       res.json({
         status: 'success',
@@ -89,12 +89,12 @@ exports.delete = function (req, res) {
 };
 
 function saveRecipe(recipe, req, res) {
-  const { categories, title, ingredients, procedure, image } = req.body;
-  recipe.categories = categories;
+  const { title, image, categories, ingredients, procedure } = req.body;
   recipe.title = title;
+  recipe.image = image;
+  recipe.categories = categories;
   recipe.ingredients = ingredients;
   recipe.procedure = procedure;
-  recipe.image = image;
 
   recipe.save(err => {
     if (err) {

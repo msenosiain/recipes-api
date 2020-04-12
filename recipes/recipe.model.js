@@ -34,8 +34,4 @@ recipeSchema.plugin(mongoosastic, {
 
 const Recipe = mongoose.model('recipe', recipeSchema);
 
-// Recipe.createMapping((err, mapping) => {
-//   console.log('recipe mapping created');
-// });
-
 module.exports = Recipe;

@@ -2,8 +2,9 @@ const router = require('express').Router();
 
 const recipeController = require('../recipes/recipe.controller');
 const imagesController = require('../images/images.controller');
+
 // Set default API response
-router.get('/', function (req, res) {
+router.get('/', (req, res) => {
   res.json({
     status: 'API Its Working',
     message: 'Welcome to API, crafted with love!'
