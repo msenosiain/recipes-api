@@ -14,9 +14,10 @@ router.get('/', (req, res) => {
 // Recipes Routes
 router
   .route('/recipes')
-  .get(recipeController.index)
+  .get(recipeController.list)
   .post(recipeController.new)
   .patch(recipeController.reindex);
+router.route('/recipes/search').get(recipeController.search);
 router
   .route('/recipes/:id')
   .get(recipeController.view)

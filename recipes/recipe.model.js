@@ -15,14 +15,15 @@ const ingredientSchema = mongoose.Schema(
 const recipeSchema = mongoose.Schema(
   {
     categories: { type: [String], required: true, es_indexed: true },
-    title: { type: String, required: true, es_indexed: true },
+    title: { type: String, required: true, trim: true, es_indexed: true },
     ingredients: {
       type: [ingredientSchema],
       required: true,
+      trim: true,
       es_indexed: false
     },
-    procedure: { type: String, required: true },
-    image: String
+    procedure: { type: String, required: true, trim: true },
+    image: { type: String, es_indexed: true }
   },
   { timestamps: true }
 );

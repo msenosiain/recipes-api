@@ -4,7 +4,44 @@ Recipe = require('./recipe.model');
 const NOT_FOUND_ONE = 'Recipe not found';
 const NOT_FOUND_MANY = 'No recipes found';
 
-// Handle index actions
+exports.list = (req, res) => {
+  Recipe.search(
+    {
+      match_all: {}
+    },
+    {
+      from: req.params.from || 0,
+      size: req.params.from || 10
+    },
+    (err, response) => {
+      handleResults(err, response, res);
+    }
+  );
+};
+
+exports.search = (req, res) => {
+  const keyword = req.query.q ? `${req.query.q}*`.toLowerCase() : '';
+
+  Recipe.search(
+    {
+      simple_query_string: {
+        query: keyword,
+        fields: ['categories', 'title']
+      }
+    },
+    {
+      from: req.params.from || 0,
+      size: req.params.from || 10
+    },
+    (err, response) => {
+      handleResults(err, response, res);
+    }
+  );
+};
+
+/**
+ * @deprecated use list or search
+ */
 exports.index = (req, res) => {
   Recipe.find({}, (err, recipes) => {
     if (!recipes || !recipes.length) {
@@ -106,4 +143,25 @@ function saveRecipe(recipe, req, res) {
       data: recipe
     });
   });
+}
+
+function handleResults(err, response, res) {
+  if (err) {
+    return resHelper.handleError(err, res);
+  }
+  if (!response || !response.hits.hits.length) {
+    return resHelper.handleNotFound(NOT_FOUND_MANY, res);
+  }
+  if (response.hits.hits.length) {
+    return res.json({
+      message: 'Recipes retrieved successfully',
+      data: {
+        total: response.hits.total,
+        items: response.hits.hits.map(item => ({
+          id: item._id,
+          ...item._source
+        }))
+      }
+    });
+  }
 }
