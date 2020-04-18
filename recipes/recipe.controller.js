@@ -90,7 +90,7 @@ exports.view = (req, res) => {
     if (recipe) {
       res.json({
         message: 'Recipe details',
-        data: recipe
+        data: recipe.toClient()
       });
     }
   });

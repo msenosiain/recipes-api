@@ -28,6 +28,15 @@ const recipeSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+recipeSchema.method('toClient', function () {
+  var obj = this.toObject();
+
+  obj.id = obj._id;
+  delete obj._id;
+
+  return obj;
+});
+
 recipeSchema.plugin(mongoosastic, {
   host: process.env.ELASTISEARCH_HOST,
   port: process.env.ELASTISEARCH_HOST_PORT
