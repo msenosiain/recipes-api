@@ -49,7 +49,6 @@ exports.processUpload = (req, res) => {
 
 exports.view = (req, res) => {
   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-    console.log(file);
     if (file) {
       const readstream = gfs.createReadStream(file.filename);
       readstream.pipe(res);
